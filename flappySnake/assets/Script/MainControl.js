@@ -10,9 +10,7 @@ export const GameStatus = {
 	Game_over: 2
 }
 import AudioSourceControl from "./AudioSourceControl"
-import {
-	SoundType
-} from "./AudioSourceControl"
+import { SoundType } from "./AudioSourceControl"
 cc.Class({
 	extends: cc.Component,
 
@@ -30,6 +28,14 @@ cc.Class({
 			type: cc.Prefab
 		},
 		pipe: {
+			default: [],
+			type: [cc.Node]
+		},
+		bodyPrefab: {
+			default: null,
+			type: cc.Prefab
+		},
+		body: {
 			default: [],
 			type: [cc.Node]
 		},
@@ -109,7 +115,18 @@ cc.Class({
 			}
 		}
 	},
-
+	
+	// 获取跟随者数组
+	getBodys () {
+		let long = 102
+		for (let i = 0; i < 4; i++) {
+			this.body[i] = cc.instantiate(this.bodyPrefab);
+			this.node.getChildByName("Body").addChild(this.body[i]);
+			long -= 102
+			this.body[i].x = long
+		}
+	},
+	
 	touchStartBtn() {
 		// 隐藏开始按钮
 		this.btnStart.node.active = false;
@@ -131,6 +148,7 @@ cc.Class({
 		// 分数清零
 		this.gameScore = 0;
 		this.labelScore.string = this.gameScore.toString();
+		this.getBodys();
 	},
 	
 	gameOver() {

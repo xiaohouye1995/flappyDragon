@@ -5,15 +5,10 @@
 // Learn life-cycle callbacks:
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 import MainControl from "./MainControl"
-import {
-	GameStatus
-} from "./MainControl"
-import {
-	SoundType
-} from "./AudioSourceControl"
+import { GameStatus } from "./MainControl"
+import { SoundType } from "./AudioSourceControl"
 cc.Class({
 	extends: cc.Component,
-
 	properties: {
 		// 角色速度
 		speed: 0,
@@ -24,7 +19,7 @@ cc.Class({
 		mainControl: {
 			default: null,
 			type: MainControl
-		},
+		}
 	},
 
 	onLoad() {
@@ -37,13 +32,12 @@ cc.Class({
 		this.accRight = false;
 		// 角色当前水平方向速度
 		this.xSpeed = 0;
-		
 		// 获得游戏角色
 		// this.bird = this.node.getChildByName("Bird").getComponent(cc.Sprite);
 	},
 
 	start() {
-
+		// this.getBodys()
 	},
 
 	update(dt) {
@@ -51,16 +45,20 @@ cc.Class({
 		if (this.mainControl.gameStatus !== GameStatus.Game_playing) {
 			return
 		}
-		this.speed -= 0.15;
+		this.speed -= 0.2;
 		this.node.y += this.speed;
-
+		
 		// 小鸟飞行倾斜角度
-		let angle = -(this.speed/2)*30;
-		if (angle >= 30) {
-			angle = 30;
+		// let angle = -(this.speed/2)*30;
+		// if (angle >= 30) {
+		// 	angle = 30;
+		// }
+		let angle = -(this.speed/4)*20;
+		if (angle >= 20) {
+			angle = 20;
 		}
 		this.node.rotation = angle;
-
+		
 		// 当小鸟超出屏幕，游戏结束
 		if (this.node.y >= 654 || this.node.y <= -654) {
 			this.mainControl.gameOver();
@@ -80,6 +78,18 @@ cc.Class({
 		}
 		// 根据当前速度更新主角的位置
 		this.node.x += this.xSpeed * dt;
+		
+		// let yyy = 0
+		// 身体飞行轨迹
+		for (let i = 0; i < this.mainControl.body.length; i++) {
+			// yyy -= 20;
+			// this.mainControl.body[i].y = this.node.y + yyy;
+			// let minY = -1;
+			// let maxY = 1;
+			this.mainControl.body[i].y = this.node.y + Math.random();
+			this.mainControl.body[i].rotation = this.node.rotation + Math.random();
+			// this.mainControl.body[i].x += this.node.x;
+		}
 	},
 
 	onTouchStart() {
@@ -88,11 +98,23 @@ cc.Class({
 			return
 		}
 		this.speed = 5;
+		let angle = -(this.speed/4)*20;
+		if (angle >= 20) {
+			angle = 20;
+		}
+		// for (let i = 0; i < this.mainControl.body.length; i++) {
+		// 	this.mainControl.body[i].rotation = angle + Math.random() * 2;
+		// }
 		// 播放飞翔音效
 		this.mainControl.audioControl.playSound(SoundType.E_Sound_Fly)
 	},
 
 	onCollisionEnter() {
+		if (this.mainControl.body.length !== 0) {
+			this.mainControl.node.getChildByName("Body").removeChild(this.mainControl.body[this.mainControl.body.length - 1]);
+			this.mainControl.body.pop();
+			return
+		}
 		// 游戏结束
 		cc.log("gameover");
 		this.mainControl.gameOver();
