@@ -7,7 +7,8 @@
 export const SoundType = {
   E_Sound_Fly: 0,
   E_Sound_Score: 1,
-  E_Sound_Die: 2
+  E_Sound_Die: 2,
+  E_Sound_Life: 3
 }
 cc.Class({
     extends: cc.Component,
@@ -29,6 +30,10 @@ cc.Class({
 		dieSound: {
 			default: null,
 			type: cc.AudioClip
+		},
+		lifeSound: {
+			default: null,
+			type: cc.AudioClip
 		}
     },
 
@@ -44,6 +49,8 @@ cc.Class({
 			cc.audioEngine.playEffect(this.scoreSound, false);
 		} else if (type == SoundType.E_Sound_Die) {
 			cc.audioEngine.playEffect(this.dieSound, false);
+		} else if (type == SoundType.E_Sound_Life) {
+			cc.audioEngine.playEffect(this.lifeSound, false);
 		}
 			
 	}

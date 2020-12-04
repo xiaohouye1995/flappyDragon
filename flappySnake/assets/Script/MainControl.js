@@ -182,5 +182,7 @@ cc.Class({
 		this.gameStatus = GameStatus.Game_over;
 		// 播放结束音效
 		this.audioControl.playSound(SoundType.E_Sound_Die);
+		this.node.getChildByName("Body").removeAllChildren();
+		this.body = [];
 	}
 });

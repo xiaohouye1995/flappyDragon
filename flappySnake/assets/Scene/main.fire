@@ -198,7 +198,7 @@
       "array": [
         0,
         0,
-        244.2191638672117,
+        341.2140090910689,
         0,
         0,
         0,
@@ -1278,7 +1278,6 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_useOriginalSize": false,
     "_string": "0",
     "_N$string": "0",
     "_fontSize": 100,
@@ -1473,6 +1472,9 @@
     },
     "dieSound": {
       "__uuid__": "fba87065-66f0-44ed-9114-7afa09b68517"
+    },
+    "lifeSound": {
+      "__uuid__": "e1d8b609-6cd5-4444-92f4-2e5b4b6ed7b4"
     },
     "_id": "d6/R/7nSdO0q7K15cxy3E2"
   },

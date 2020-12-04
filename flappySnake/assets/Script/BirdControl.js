@@ -92,6 +92,8 @@ cc.Class({
 			this.mainControl.node.getChildByName("Body").addChild(this.mainControl.body[num]);
 			this.mainControl.body[num].x = num === 0 ? 0 : this.mainControl.body[num -1].x - 102;
 			this.mainControl.life[0].x = -750;
+			// 播放加命音效
+			this.mainControl.audioControl.playSound(SoundType.E_Sound_Life);
 		} else {
 			if (this.mainControl.body.length !== 0) {
 				this.mainControl.node.getChildByName("Body").removeChild(this.mainControl.body[this.mainControl.body.length - 1]);
