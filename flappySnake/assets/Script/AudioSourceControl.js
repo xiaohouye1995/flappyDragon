@@ -34,7 +34,7 @@ cc.Class({
 
     start () {
 		// 播放背景音乐
-		cc.audioEngine.playMusic(this.backgroundMusic, true);
+		// cc.audioEngine.playMusic(this.backgroundMusic, true);
     },
 	
 	playSound (type) {

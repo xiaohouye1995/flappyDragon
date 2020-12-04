@@ -39,6 +39,14 @@ cc.Class({
 			default: [],
 			type: [cc.Node]
 		},
+		lifePrefab: {
+			default: null,
+			type: cc.Prefab
+		},
+		life: {
+			default: [],
+			type: [cc.Node]
+		},
 		spGameOver: {
 			default: null,
 			type: cc.Sprite
@@ -80,9 +88,15 @@ cc.Class({
 			this.node.getChildByName("Pipe").addChild(this.pipe[i]);
 			this.pipe[i].x = 170 + 400 * i;
 			let minY = -800;
-			let maxY = -400;
+			let maxY = -411;
 			this.pipe[i].y = minY + Math.random() * (maxY - minY);
 		}
+		
+		// 生成奖励心心
+		this.life[0] = cc.instantiate(this.lifePrefab);
+		this.node.getChildByName("Life").addChild(this.life[0]);
+		this.life[0].x = 570;
+		this.life[0].y = 0;
 	},
 
 	update(dt) {
@@ -103,9 +117,9 @@ cc.Class({
 		for (let i = 0; i < this.pipe.length; i++) {
 			this.pipe[i].x -= 6;
 			if (this.pipe[i].x <= -750) {
-				this.pipe[i].x = 750;
+				this.pipe[i].x = 750;			
 				let minY = -800;
-				let maxY = -400;
+				let maxY = -411;
 				this.pipe[i].y = minY + Math.random() * (maxY - minY);
 				// 播放加分音效
 				this.audioControl.playSound(SoundType.E_Sound_Score);
@@ -114,12 +128,20 @@ cc.Class({
 				this.labelScore.string = this.gameScore.toString();
 			}
 		}
+		
+		// 移动奖励心心
+		this.life[0].x -= 6;
+		if (this.life[0].x <= -2750) {
+			this.life[0].x = 750;
+			this.life[0].y = 0;
+		}
+		
 	},
 	
 	// 获取跟随者数组
 	getBodys () {
 		let long = 102
-		for (let i = 0; i < 4; i++) {
+		for (let i = 0; i < 2; i++) {
 			this.body[i] = cc.instantiate(this.bodyPrefab);
 			this.node.getChildByName("Body").addChild(this.body[i]);
 			long -= 102
@@ -138,13 +160,13 @@ cc.Class({
 		for (let i = 0; i < this.pipe.length; i++) {
 			this.pipe[i].x = 170 + 400 * i;
 			let minY = -800;
-			let maxY = -400;
+			let maxY = -411;
 			this.pipe[i].y = minY + Math.random() * (maxY - minY);
 		}
 		// 再来一局时，还原主角位置和角度
 		let bird = this.node.getChildByName("Bird");
 		bird.y = 100;
-		bird.rotation = 0;
+		// bird.rotation = 0;
 		// 分数清零
 		this.gameScore = 0;
 		this.labelScore.string = this.gameScore.toString();
