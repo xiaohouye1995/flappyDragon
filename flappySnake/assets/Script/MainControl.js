@@ -86,10 +86,11 @@ cc.Class({
 		for (let i = 0; i < 3; i++) {
 			this.pipe[i] = cc.instantiate(this.pipePrefab);
 			this.node.getChildByName("Pipe").addChild(this.pipe[i]);
-			this.pipe[i].x = 170 + 400 * i;
-			let minY = -800;
-			let maxY = -411;
-			this.pipe[i].y = minY + Math.random() * (maxY - minY);
+			this.minX = 512;
+			this.minY = -700;
+			this.maxY = -500;
+			this.pipe[i].x = this.minX * i;
+			this.pipe[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 		}
 		
 		// 生成奖励心心
@@ -104,23 +105,25 @@ cc.Class({
 		if (this.gameStatus !== GameStatus.Game_playing) {
 			return
 		}
-
+		
+		// 移动距离
+		let moveWidth = 750
+		let moveSpeed = 14
+		
 		// 移动背景图
 		for (let i = 0; i < this.SpBg.length; i++) {
-			this.SpBg[i].node.x -= 6;
-			if (this.SpBg[i].node.x <= -750) {
-				this.SpBg[i].node.x = 750;
+			this.SpBg[i].node.x -= moveSpeed;
+			if (this.SpBg[i].node.x <= -moveWidth) {
+				this.SpBg[i].node.x = moveWidth;
 			}
 		}
 
 		// 移动障碍物
 		for (let i = 0; i < this.pipe.length; i++) {
-			this.pipe[i].x -= 6;
-			if (this.pipe[i].x <= -750) {
-				this.pipe[i].x = 750;			
-				let minY = -800;
-				let maxY = -411;
-				this.pipe[i].y = minY + Math.random() * (maxY - minY);
+			this.pipe[i].x -= moveSpeed;
+			if (this.pipe[i].x <= -moveWidth) {
+				this.pipe[i].x = moveWidth;			
+				this.pipe[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 				// 播放加分音效
 				this.audioControl.playSound(SoundType.E_Sound_Score);
 				// 分数
@@ -130,9 +133,9 @@ cc.Class({
 		}
 		
 		// 移动奖励心心
-		this.life[0].x -= 6;
+		this.life[0].x -= moveSpeed;
 		if (this.life[0].x <= -2750) {
-			this.life[0].x = 750;
+			this.life[0].x = moveWidth;
 			this.life[0].y = 0;
 		}
 		
@@ -158,10 +161,8 @@ cc.Class({
 		this.spGameOver.node.active = false;
 		// 再来一局时，障碍物重置位置
 		for (let i = 0; i < this.pipe.length; i++) {
-			this.pipe[i].x = 170 + 400 * i;
-			let minY = -800;
-			let maxY = -411;
-			this.pipe[i].y = minY + Math.random() * (maxY - minY);
+			this.pipe[i].x = this.minX * i;
+			this.pipe[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 		}
 		// 再来一局时，还原主角位置和角度
 		let bird = this.node.getChildByName("Bird");

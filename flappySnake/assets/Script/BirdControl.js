@@ -34,7 +34,7 @@ cc.Class({
 			return
 		}
 		
-		this.speed -= 0.2;
+		this.speed -= 0.4;
 		this.node.y += this.speed;
 		
 		// 小鸟飞行倾斜角度
@@ -79,7 +79,7 @@ cc.Class({
 		if (this.mainControl.gameStatus !== GameStatus.Game_playing) {
 			return
 		}
-		this.speed = 5;
+		this.speed = 9;
 		// 播放飞翔音效
 		this.mainControl.audioControl.playSound(SoundType.E_Sound_Fly)
 	},
