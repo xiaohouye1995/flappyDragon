@@ -12,7 +12,6 @@ cc.Class({
 	properties: {
 		// 角色速度
 		speed: 0,
-		gravity: 1,
 		mainControl: {
 			default: null,
 			type: MainControl
@@ -34,18 +33,14 @@ cc.Class({
 			return
 		}
 		
-		this.speed -= 0.4;
+		this.speed -= 0.8;
 		this.node.y += this.speed;
 		
 		// 小鸟飞行倾斜角度
-		// let angle = -(this.speed/2)*30;
-		// if (angle >= 30) {
-		// 	angle = 30;
+		// let angle = -(this.speed/4)*20;
+		// if (angle >= 20) {
+		// 	angle = 20;
 		// }
-		let angle = -(this.speed/4)*20;
-		if (angle >= 20) {
-			angle = 20;
-		}
 		// this.node.rotation = angle;
 		
 		// 当小鸟超出屏幕，游戏结束
@@ -53,24 +48,14 @@ cc.Class({
 			this.mainControl.gameOver();
 			this.speed = 0;
 		}
-
-		let yyy = 0
+		
 		// 身体飞行轨迹
-		for (let i = 0; i < this.mainControl.body.length; i++) {
-			// yyy -= 20;
-			// this.mainControl.body[i].y = this.node.y + yyy;
-			// let minY = -1;
-			// let maxY = 1;
-			if (angle > 0) {
-				yyy += 20;
-			} else if (angle === 0) {
-				yyy = 0
+		for(var i = 0; i < this.mainControl.body.length; i++){
+			if (i === 0) {
+				this.mainControl.body[i].y = this.node.y - (this.node.y - this.mainControl.body[i].y) * .9;
 			} else {
-				yyy -= 20;
+				this.mainControl.body[i].y = this.mainControl.body[i-1].y - (this.mainControl.body[i-1].y - this.mainControl.body[i].y) * .9;
 			}
-			this.mainControl.body[i].y = this.node.y + Math.random() + yyy;
-			// this.mainControl.body[i].rotation = this.node.rotation + Math.random();
-			// this.mainControl.body[i].x += this.node.x;
 		}
 	},
 
@@ -79,7 +64,7 @@ cc.Class({
 		if (this.mainControl.gameStatus !== GameStatus.Game_playing) {
 			return
 		}
-		this.speed = 9;
+		this.speed = 13;
 		// 播放飞翔音效
 		this.mainControl.audioControl.playSound(SoundType.E_Sound_Fly)
 	},
@@ -107,7 +92,5 @@ cc.Class({
 			this.mainControl.gameOver();
 			this.speed = 0;
 		}
-		
 	}
-
 });

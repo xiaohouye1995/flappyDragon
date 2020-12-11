@@ -86,9 +86,9 @@ cc.Class({
 		for (let i = 0; i < 3; i++) {
 			this.pipe[i] = cc.instantiate(this.pipePrefab);
 			this.node.getChildByName("Pipe").addChild(this.pipe[i]);
-			this.minX = 512;
-			this.minY = -700;
-			this.maxY = -500;
+			this.minX = 750;
+			this.minY = -800;
+			this.maxY = -550;
 			this.pipe[i].x = this.minX * i;
 			this.pipe[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 		}
@@ -108,7 +108,7 @@ cc.Class({
 		
 		// 移动距离
 		let moveWidth = 750
-		let moveSpeed = 14
+		let moveSpeed = 12
 		
 		// 移动背景图
 		for (let i = 0; i < this.SpBg.length; i++) {
@@ -121,7 +121,7 @@ cc.Class({
 		// 移动障碍物
 		for (let i = 0; i < this.pipe.length; i++) {
 			this.pipe[i].x -= moveSpeed;
-			if (this.pipe[i].x <= -moveWidth) {
+			if (this.pipe[i].x <= -1400) {
 				this.pipe[i].x = moveWidth;			
 				this.pipe[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 				// 播放加分音效
