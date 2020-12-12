@@ -67,6 +67,8 @@ cc.Class({
 		this.speed = 13;
 		// 播放飞翔音效
 		this.mainControl.audioControl.playSound(SoundType.E_Sound_Fly)
+		// this.mainControl.moveSpeed = this.mainControl.moveSpeed + this.mainControl.gameScore / 10
+		// console.log('速度', this.mainControl.moveSpeed)
 	},
 
 	onCollisionEnter(other, self) {
@@ -75,7 +77,7 @@ cc.Class({
 			this.mainControl.body.push(cc.instantiate(this.mainControl.bodyPrefab));
 			let num = this.mainControl.body.length -1;
 			this.mainControl.node.getChildByName("Body").addChild(this.mainControl.body[num]);
-			this.mainControl.body[num].x = num === 0 ? 0 : this.mainControl.body[num -1].x - 102;
+			this.mainControl.body[num].x = num === 0 ? 0 : this.mainControl.body[num -1].x - 70;
 			this.mainControl.life[0].x = -750;
 			// 播放加命音效
 			this.mainControl.audioControl.playSound(SoundType.E_Sound_Life);

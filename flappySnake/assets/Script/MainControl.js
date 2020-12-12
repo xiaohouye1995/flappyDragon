@@ -60,7 +60,8 @@ cc.Class({
 		audioControl: {
 			default: null,
 			type: AudioSourceControl
-		}
+		},
+		moveSpeed: 0
 	},
 
 	onLoad() {
@@ -86,9 +87,9 @@ cc.Class({
 		for (let i = 0; i < 3; i++) {
 			this.pipe[i] = cc.instantiate(this.pipePrefab);
 			this.node.getChildByName("Pipe").addChild(this.pipe[i]);
-			this.minX = 750;
+			this.minX = 900;
 			this.minY = -800;
-			this.maxY = -550;
+			this.maxY = -500;
 			this.pipe[i].x = this.minX * i;
 			this.pipe[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 		}
@@ -108,24 +109,28 @@ cc.Class({
 		
 		// 移动距离
 		let moveWidth = 750
-		let moveSpeed = 12
-		
-		// 移动背景图
-		for (let i = 0; i < this.SpBg.length; i++) {
-			this.SpBg[i].node.x -= moveSpeed;
-			if (this.SpBg[i].node.x <= -moveWidth) {
-				this.SpBg[i].node.x = moveWidth;
-			}
+		// 移动速度
+		let newMoveSpeed = this.moveSpeed + this.gameScore / 10;
+		if (newMoveSpeed > 30) {
+			newMoveSpeed = 30
 		}
+
+		// 移动背景图
+		// for (let i = 0; i < this.SpBg.length; i++) {
+		// 	this.SpBg[i].node.x -= newMoveSpeed;		
+		// 	if (this.SpBg[i].node.x <= -700) {
+		// 		this.SpBg[i].node.x = moveWidth;
+		// 	}
+		// }
 
 		// 移动障碍物
 		for (let i = 0; i < this.pipe.length; i++) {
-			this.pipe[i].x -= moveSpeed;
-			if (this.pipe[i].x <= -1400) {
+			this.pipe[i].x -= newMoveSpeed;
+			if (this.pipe[i].x <= -1700) {
 				this.pipe[i].x = moveWidth;			
 				this.pipe[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 				// 播放加分音效
-				this.audioControl.playSound(SoundType.E_Sound_Score);
+				// this.audioControl.playSound(SoundType.E_Sound_Score);
 				// 分数
 				this.gameScore += 1;
 				this.labelScore.string = this.gameScore.toString();
@@ -133,7 +138,7 @@ cc.Class({
 		}
 		
 		// 移动奖励心心
-		this.life[0].x -= moveSpeed;
+		this.life[0].x -= newMoveSpeed;
 		if (this.life[0].x <= -2750) {
 			this.life[0].x = moveWidth;
 			this.life[0].y = 0;
@@ -143,11 +148,11 @@ cc.Class({
 	
 	// 获取跟随者数组
 	getBodys () {
-		let long = 102
+		let long = 70
 		for (let i = 0; i < 2; i++) {
 			this.body[i] = cc.instantiate(this.bodyPrefab);
 			this.node.getChildByName("Body").addChild(this.body[i]);
-			long -= 102
+			long -= 70
 			this.body[i].x = long
 		}
 	},
@@ -170,6 +175,8 @@ cc.Class({
 		// bird.rotation = 0;
 		// 分数清零
 		this.gameScore = 0;
+		// 速度清零
+		this.moveSpeed = 8;
 		this.labelScore.string = this.gameScore.toString();
 		this.getBodys();
 	},
