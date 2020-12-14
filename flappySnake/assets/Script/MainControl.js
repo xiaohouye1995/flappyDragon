@@ -23,11 +23,11 @@ cc.Class({
 			default: [],
 			type: [cc.Sprite]
 		},
-		pipePrefab: {
+		bricksPrefab: {
 			default: null,
 			type: cc.Prefab
 		},
-		pipe: {
+		bricks: {
 			default: [],
 			type: [cc.Node]
 		},
@@ -85,20 +85,23 @@ cc.Class({
 	start() {
 		// 生成障碍物
 		for (let i = 0; i < 3; i++) {
-			this.pipe[i] = cc.instantiate(this.pipePrefab);
-			this.node.getChildByName("Pipe").addChild(this.pipe[i]);
-			this.minX = 900;
-			this.minY = -800;
-			this.maxY = -500;
-			this.pipe[i].x = this.minX * i;
-			this.pipe[i].y = this.minY + Math.random() * (this.maxY - this.minY);
+			this.bricks[i] = cc.instantiate(this.bricksPrefab);
+			this.node.getChildByName("Bricks").addChild(this.bricks[i]);
+			this.minX = 700;
+			this.maxX = 700;
+			this.minY = -500;
+			this.maxY = -200;
+			this.bricks[i].x = this.minX * i + Math.random() * 200;
+			this.bricks[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 		}
 		
 		// 生成奖励心心
 		this.life[0] = cc.instantiate(this.lifePrefab);
 		this.node.getChildByName("Life").addChild(this.life[0]);
 		this.life[0].x = 570;
-		this.life[0].y = 0;
+		this.lifeMinY = -500;
+		this.lifeMaxY = 500
+		this.life[0].y = this.lifeMinY + Math.random() * (this.lifeMaxY - this.lifeMinY);
 	},
 
 	update(dt) {
@@ -124,11 +127,11 @@ cc.Class({
 		// }
 
 		// 移动障碍物
-		for (let i = 0; i < this.pipe.length; i++) {
-			this.pipe[i].x -= newMoveSpeed;
-			if (this.pipe[i].x <= -1700) {
-				this.pipe[i].x = moveWidth;			
-				this.pipe[i].y = this.minY + Math.random() * (this.maxY - this.minY);
+		for (let i = 0; i < this.bricks.length; i++) {
+			this.bricks[i].x -= newMoveSpeed;
+			if (this.bricks[i].x <= -1300) {
+				this.bricks[i].x = moveWidth;			
+				this.bricks[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 				// 播放加分音效
 				// this.audioControl.playSound(SoundType.E_Sound_Score);
 				// 分数
@@ -141,7 +144,7 @@ cc.Class({
 		this.life[0].x -= newMoveSpeed;
 		if (this.life[0].x <= -2750) {
 			this.life[0].x = moveWidth;
-			this.life[0].y = 0;
+			this.life[0].y = this.lifeMinY + Math.random() * (this.lifeMaxY - this.lifeMinY);
 		}
 		
 	},
@@ -165,9 +168,9 @@ cc.Class({
 		// 再来一局时，隐藏gameover图片
 		this.spGameOver.node.active = false;
 		// 再来一局时，障碍物重置位置
-		for (let i = 0; i < this.pipe.length; i++) {
-			this.pipe[i].x = this.minX * i;
-			this.pipe[i].y = this.minY + Math.random() * (this.maxY - this.minY);
+		for (let i = 0; i < this.bricks.length; i++) {
+			this.bricks[i].x = this.minX * i;
+			this.bricks[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 		}
 		// 再来一局时，还原主角位置和角度
 		let bird = this.node.getChildByName("Bird");

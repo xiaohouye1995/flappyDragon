@@ -74,11 +74,13 @@ cc.Class({
 	onCollisionEnter(other, self) {
 		if (other.tag === 1) {
 			cc.log("add life");
-			this.mainControl.body.push(cc.instantiate(this.mainControl.bodyPrefab));
-			let num = this.mainControl.body.length -1;
-			this.mainControl.node.getChildByName("Body").addChild(this.mainControl.body[num]);
-			this.mainControl.body[num].x = num === 0 ? 0 : this.mainControl.body[num -1].x - 70;
-			this.mainControl.life[0].x = -750;
+			if (this.mainControl.body.length < 6) {
+				this.mainControl.body.push(cc.instantiate(this.mainControl.bodyPrefab));
+				let num = this.mainControl.body.length -1;
+				this.mainControl.node.getChildByName("Body").addChild(this.mainControl.body[num]);
+				this.mainControl.body[num].x = num === 0 ? 0 : this.mainControl.body[num -1].x - 70;
+				this.mainControl.life[0].x = -750;
+			}
 			// 播放加命音效
 			this.mainControl.audioControl.playSound(SoundType.E_Sound_Life);
 		} else {
