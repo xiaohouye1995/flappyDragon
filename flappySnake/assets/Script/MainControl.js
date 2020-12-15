@@ -44,8 +44,16 @@ cc.Class({
 			type: cc.Prefab
 		},
 		life: {
-			default: [],
-			type: [cc.Node]
+			default: null,
+			type: cc.Sprite
+		},
+		gemPrefab: {
+			default: null,
+			type: cc.Prefab
+		},
+		gem: {
+			default: null,
+			type: cc.Sprite
 		},
 		spGameOver: {
 			default: null,
@@ -79,7 +87,7 @@ cc.Class({
 		// 给开始按钮添加响应
 		this.btnStart.node.on(cc.Node.EventType.TOUCH_END, this.touchStartBtn, this);
 		// 获取音频模块
-		this.audioControl = this.node.getChildByName("AudioSource").getComponent("AudioSourceControl");
+		this.audioControl = this.node.getChildByName("AudioSource").getComponent("AudioSourceControl");		
 	},
 
 	start() {
@@ -87,7 +95,7 @@ cc.Class({
 		for (let i = 0; i < 3; i++) {
 			this.bricks[i] = cc.instantiate(this.bricksPrefab);
 			this.node.getChildByName("Bricks").addChild(this.bricks[i]);
-			this.minX = 700;
+			this.minX = 600;
 			this.maxX = 700;
 			this.minY = -500;
 			this.maxY = -200;
@@ -96,12 +104,20 @@ cc.Class({
 		}
 		
 		// 生成奖励心心
-		this.life[0] = cc.instantiate(this.lifePrefab);
-		this.node.getChildByName("Life").addChild(this.life[0]);
-		this.life[0].x = 570;
+		this.life = cc.instantiate(this.lifePrefab);
+		this.node.getChildByName("Life").addChild(this.life);
+		this.life.x = 570;
 		this.lifeMinY = -500;
-		this.lifeMaxY = 500
-		this.life[0].y = this.lifeMinY + Math.random() * (this.lifeMaxY - this.lifeMinY);
+		this.lifeMaxY = 500;
+		this.life.y = this.lifeMinY + Math.random() * (this.lifeMaxY - this.lifeMinY);
+		
+		// 生成保护盾钻石
+		this.gem = cc.instantiate(this.gemPrefab);
+		this.node.getChildByName("Gem").addChild(this.gem);
+		this.gem.x = 770;
+		this.gemMinY = -500;
+		this.gemMaxY = 500;
+		this.gem.y = this.gemMinY + Math.random() * (this.gemMaxY - this.gemMinY);
 	},
 
 	update(dt) {
@@ -129,7 +145,7 @@ cc.Class({
 		// 移动障碍物
 		for (let i = 0; i < this.bricks.length; i++) {
 			this.bricks[i].x -= newMoveSpeed;
-			if (this.bricks[i].x <= -1300) {
+			if (this.bricks[i].x <= -1100) {
 				this.bricks[i].x = moveWidth;			
 				this.bricks[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 				// 播放加分音效
@@ -141,16 +157,23 @@ cc.Class({
 		}
 		
 		// 移动奖励心心
-		this.life[0].x -= newMoveSpeed;
-		if (this.life[0].x <= -2750) {
-			this.life[0].x = moveWidth;
-			this.life[0].y = this.lifeMinY + Math.random() * (this.lifeMaxY - this.lifeMinY);
+		this.life.x -= newMoveSpeed;
+		if (this.life.x <= -2750) {
+			this.life.x = moveWidth;
+			this.life.y = this.lifeMinY + Math.random() * (this.lifeMaxY - this.lifeMinY);
+		}
+		
+		// 移动钻石
+		this.gem.x -= newMoveSpeed;
+		if (this.gem.x <= -2750) {
+			this.gem.x = moveWidth;
+			this.gem.y = this.lifeMinY + Math.random() * (this.lifeMaxY - this.lifeMinY);
 		}
 		
 	},
 	
 	// 获取跟随者数组
-	getBodys () {
+	getBodys() {
 		let long = 70
 		for (let i = 0; i < 2; i++) {
 			this.body[i] = cc.instantiate(this.bodyPrefab);

@@ -15,13 +15,22 @@ cc.Class({
 		mainControl: {
 			default: null,
 			type: MainControl
-		}
+		},
+		spShield: {
+			default: null,
+			type: cc.Sprite
+		},
+		gemStatus: 0
 	},
 
 	onLoad() {
 		cc.Canvas.instance.node.on(cc.Node.EventType.TOUCH_START, this.onTouchStart, this);
 		// 初始化mainControl
 		this.mainControl = cc.Canvas.instance.node.getComponent("MainControl");
+		// 获得bird下保护盾
+		this.spShield = this.node.getChildByName("Shield");
+		// 隐藏保护盾
+		this.spShield.active = false;
 	},
 
 	start() {
@@ -32,6 +41,15 @@ cc.Class({
 		if (this.mainControl.gameStatus !== GameStatus.Game_playing) {
 			return
 		}
+		
+		// 判断保护盾状态
+		if (this.gemStatus > 0) {
+			this.gemStatus -= 0.1;
+		} else {
+			this.mainControl.moveSpeed = 10;
+			this.spShield.active = false;
+		}
+		
 		
 		this.speed -= 0.8;
 		this.node.y += this.speed;
@@ -67,34 +85,62 @@ cc.Class({
 		this.speed = 13;
 		// 播放飞翔音效
 		this.mainControl.audioControl.playSound(SoundType.E_Sound_Fly)
-		// this.mainControl.moveSpeed = this.mainControl.moveSpeed + this.mainControl.gameScore / 10
-		// console.log('速度', this.mainControl.moveSpeed)
 	},
 
 	onCollisionEnter(other, self) {
-		if (other.tag === 1) {
-			cc.log("add life");
-			if (this.mainControl.body.length < 6) {
-				this.mainControl.body.push(cc.instantiate(this.mainControl.bodyPrefab));
-				let num = this.mainControl.body.length -1;
-				this.mainControl.node.getChildByName("Body").addChild(this.mainControl.body[num]);
-				this.mainControl.body[num].x = num === 0 ? 0 : this.mainControl.body[num -1].x - 70;
-				this.mainControl.life[0].x = -750;
-			}
-			// 播放加命音效
-			this.mainControl.audioControl.playSound(SoundType.E_Sound_Life);
-		} else {
-			if (this.mainControl.body.length !== 0) {
-				this.mainControl.node.getChildByName("Body").removeChild(this.mainControl.body[this.mainControl.body.length - 1]);
-				this.mainControl.body.pop();
-				// 播放碰撞音效
-				this.mainControl.audioControl.playSound(SoundType.E_Sound_Die);
-				return
-			}
-			// 游戏结束
-			cc.log("gameover");
-			this.mainControl.gameOver();
-			this.speed = 0;
+		switch (other.tag) {
+		    case 0:
+		        this.boxCollision()
+		        break;
+		    case 1:
+		        this.lifeCollision()
+		        break;
+		    case 2:
+		        this.gemCollision()
+		        break;
+		} 
+	},
+	
+	// 碰撞障碍物
+	boxCollision() {
+		if (this.gemStatus > 0) return;
+		
+		if (this.mainControl.body.length !== 0) {
+			this.mainControl.node.getChildByName("Body").removeChild(this.mainControl.body[this.mainControl.body.length - 1]);
+			this.mainControl.body.pop();
+			// 播放碰撞音效
+			this.mainControl.audioControl.playSound(SoundType.E_Sound_Die);
+			this.spShield.active = false;
+			return
 		}
+		// 游戏结束
+		cc.log("gameover");
+		this.mainControl.gameOver();
+		this.speed = 0;
+	},
+	
+	// 碰撞心心
+	lifeCollision() {
+		if (this.mainControl.body.length < 6) {
+			this.mainControl.body.push(cc.instantiate(this.mainControl.bodyPrefab));
+			let num = this.mainControl.body.length -1;
+			this.mainControl.node.getChildByName("Body").addChild(this.mainControl.body[num]);
+			this.mainControl.body[num].x = num === 0 ? 0 : this.mainControl.body[num -1].x - 70;
+			this.mainControl.life.x = -750;
+		}
+		cc.log("add life");
+		// 播放加命音效
+		this.mainControl.audioControl.playSound(SoundType.E_Sound_Life);
+	},
+	
+	// 碰撞宝石
+	gemCollision() {
+		cc.log("get gem");
+		this.spShield.active = true;
+		this.mainControl.moveSpeed = 30;
+		this.gemStatus = 30;
+		this.mainControl.gem.x = -750;
+		// 播放加命音效
+		this.mainControl.audioControl.playSound(SoundType.E_Sound_Life);
 	}
 });
