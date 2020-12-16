@@ -41,19 +41,20 @@ cc.Class({
 		if (this.mainControl.gameStatus !== GameStatus.Game_playing) {
 			return
 		}
-		
+				
 		// 判断保护盾状态
 		if (this.gemStatus > 0) {
 			this.gemStatus -= 0.1;
+			// 直线冲刺
+			this.node.y = 0;
 		} else {
-			this.mainControl.moveSpeed = 10;
+			this.mainControl.moveSpeed = 8;
 			this.spShield.active = false;
+			// 小鸟重力下坠
+			this.speed -= 0.8;
+			this.node.y += this.speed;
 		}
-		
-		
-		this.speed -= 0.8;
-		this.node.y += this.speed;
-		
+			
 		// 小鸟飞行倾斜角度
 		// let angle = -(this.speed/4)*20;
 		// if (angle >= 20) {

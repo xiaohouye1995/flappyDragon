@@ -95,7 +95,7 @@ cc.Class({
 		for (let i = 0; i < 3; i++) {
 			this.bricks[i] = cc.instantiate(this.bricksPrefab);
 			this.node.getChildByName("Bricks").addChild(this.bricks[i]);
-			this.minX = 600;
+			this.minX = 750;
 			this.maxX = 700;
 			this.minY = -500;
 			this.maxY = -200;
@@ -145,7 +145,7 @@ cc.Class({
 		// 移动障碍物
 		for (let i = 0; i < this.bricks.length; i++) {
 			this.bricks[i].x -= newMoveSpeed;
-			if (this.bricks[i].x <= -1100) {
+			if (this.bricks[i].x <= -1400) {
 				this.bricks[i].x = moveWidth;			
 				this.bricks[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 				// 播放加分音效
