@@ -19,6 +19,10 @@ cc.Class({
 			default: null,
 			type: cc.Label
 		},
+		topScore: {
+			default: null,
+			type: cc.Label
+		},
 		SpBg: {
 			default: [],
 			type: [cc.Sprite]
@@ -82,6 +86,9 @@ cc.Class({
 		this.spGameOver = this.node.getChildByName("GameOver").getComponent(cc.Sprite);
 		// 游戏开始阶段隐藏起来
 		this.spGameOver.node.active = false;
+		// 获得最高纪录
+		this.oldTopScore = +cc.sys.localStorage.getItem('topScore') || 0
+		this.topScore.string = '最高纪录: ' + this.oldTopScore.toString();
 		// 获取开始按钮
 		this.btnStart = this.node.getChildByName("BtnStart").getComponent(cc.Button);
 		// 给开始按钮添加响应
@@ -95,10 +102,9 @@ cc.Class({
 		for (let i = 0; i < 3; i++) {
 			this.bricks[i] = cc.instantiate(this.bricksPrefab);
 			this.node.getChildByName("Bricks").addChild(this.bricks[i]);
-			this.minX = 750;
-			this.maxX = 700;
+			this.minX = 700;
 			this.minY = -500;
-			this.maxY = -200;
+			this.maxY = -100;
 			this.bricks[i].x = this.minX * i + Math.random() * 200;
 			this.bricks[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 		}
@@ -129,7 +135,7 @@ cc.Class({
 		// 移动距离
 		let moveWidth = 750
 		// 移动速度
-		let newMoveSpeed = this.moveSpeed + this.gameScore / 10;
+		let newMoveSpeed = this.moveSpeed + this.gameScore / 50;
 		if (newMoveSpeed > 30) {
 			newMoveSpeed = 30
 		}
@@ -145,7 +151,7 @@ cc.Class({
 		// 移动障碍物
 		for (let i = 0; i < this.bricks.length; i++) {
 			this.bricks[i].x -= newMoveSpeed;
-			if (this.bricks[i].x <= -1400) {
+			if (this.bricks[i].x <= -1300) {
 				this.bricks[i].x = moveWidth;			
 				this.bricks[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 				// 播放加分音效
@@ -186,6 +192,8 @@ cc.Class({
 	touchStartBtn() {
 		// 隐藏开始按钮
 		this.btnStart.node.active = false;
+		// 隐藏最高纪录
+		this.topScore.node.active = false;
 		// 游戏状态标记为Game_playing
 		this.gameStatus = GameStatus.Game_playing;
 		// 再来一局时，隐藏gameover图片
@@ -212,11 +220,18 @@ cc.Class({
 		this.spGameOver.node.active = true;
 		// 游戏结束时，显示开始按钮
 		this.btnStart.node.active = true;
+		// 游戏结束时，显示最高纪录
+		this.topScore.node.active = true;
 		// 游戏状态标记为Game_over
 		this.gameStatus = GameStatus.Game_over;
 		// 播放结束音效
 		this.audioControl.playSound(SoundType.E_Sound_Die);
 		this.node.getChildByName("Body").removeAllChildren();
 		this.body = [];
+		if (this.gameScore > this.oldTopScore) {
+			cc.sys.localStorage.setItem('topScore', this.gameScore);
+			this.oldTopScore = this.gameScore
+		}
+		this.topScore.string = '最高纪录: ' + this.oldTopScore.toString();
 	}
 });

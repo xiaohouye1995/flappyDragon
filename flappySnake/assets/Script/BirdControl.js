@@ -20,7 +20,8 @@ cc.Class({
 			default: null,
 			type: cc.Sprite
 		},
-		gemStatus: 0
+		gemStatus: false,
+		time: null
 	},
 
 	onLoad() {
@@ -41,19 +42,17 @@ cc.Class({
 		if (this.mainControl.gameStatus !== GameStatus.Game_playing) {
 			return
 		}
-				
+
 		// 判断保护盾状态
-		if (this.gemStatus > 0) {
-			this.gemStatus -= 0.1;
+		if (this.gemStatus) {
 			// 直线冲刺
 			this.node.y = 0;
 		} else {
-			this.mainControl.moveSpeed = 8;
-			this.spShield.active = false;
 			// 小鸟重力下坠
 			this.speed -= 0.8;
 			this.node.y += this.speed;
 		}
+		
 			
 		// 小鸟飞行倾斜角度
 		// let angle = -(this.speed/4)*20;
@@ -66,6 +65,7 @@ cc.Class({
 		if (this.node.y >= 654 || this.node.y <= -654) {
 			this.mainControl.gameOver();
 			this.speed = 0;
+			this.spShield.active = false;
 		}
 		
 		// 身体飞行轨迹
@@ -104,14 +104,16 @@ cc.Class({
 	
 	// 碰撞障碍物
 	boxCollision() {
-		if (this.gemStatus > 0) return;
-		
+		if (this.gemStatus) return;
+		if (this.spShield.active) {
+			this.spShield.active = false;
+			return
+		}
 		if (this.mainControl.body.length !== 0) {
 			this.mainControl.node.getChildByName("Body").removeChild(this.mainControl.body[this.mainControl.body.length - 1]);
 			this.mainControl.body.pop();
 			// 播放碰撞音效
 			this.mainControl.audioControl.playSound(SoundType.E_Sound_Die);
-			this.spShield.active = false;
 			return
 		}
 		// 游戏结束
@@ -138,10 +140,24 @@ cc.Class({
 	gemCollision() {
 		cc.log("get gem");
 		this.spShield.active = true;
+		cc.sys.localStorage.setItem('moveSpeed', this.mainControl.moveSpeed);
 		this.mainControl.moveSpeed = 30;
-		this.gemStatus = 30;
 		this.mainControl.gem.x = -750;
+		this.gemStatus = true
+		if (this.time) {
+			this.clearTimer()
+		}
+		this.time = setTimeout(() => {
+			this.mainControl.moveSpeed = +cc.sys.localStorage.getItem('moveSpeed')
+			this.gemStatus = false
+		}, 5000)
 		// 播放加命音效
 		this.mainControl.audioControl.playSound(SoundType.E_Sound_Life);
-	}
+	},
+	
+	// 清除定时器
+	clearTimer() {
+		clearTimeout(this.time);
+		this.time = null;
+	},
 });
