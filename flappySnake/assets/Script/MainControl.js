@@ -67,6 +67,10 @@ cc.Class({
 			default: null,
 			type: cc.Button
 		},
+		btnRanking: {
+			default: null,
+			type: cc.Button
+		},
 		gameStatus: 0,
 		gameScore: 0,
 		audioControl: {
@@ -93,6 +97,10 @@ cc.Class({
 		this.btnStart = this.node.getChildByName("BtnStart").getComponent(cc.Button);
 		// 给开始按钮添加响应
 		this.btnStart.node.on(cc.Node.EventType.TOUCH_END, this.touchStartBtn, this);
+		// 获取排行榜按钮
+		this.btnRanking = this.node.getChildByName("BtnRanking").getComponent(cc.Button);
+		// 给排行榜按钮添加响应
+		this.btnRanking.node.on(cc.Node.EventType.TOUCH_END, this.touchRankingBtn, this);
 		// 获取音频模块
 		this.audioControl = this.node.getChildByName("AudioSource").getComponent("AudioSourceControl");		
 	},
@@ -135,7 +143,7 @@ cc.Class({
 		// 移动距离
 		let moveWidth = 750
 		// 移动速度
-		let newMoveSpeed = this.moveSpeed + this.gameScore / 50;
+		let newMoveSpeed = this.moveSpeed + this.gameScore / 30;
 		if (newMoveSpeed > 30) {
 			newMoveSpeed = 30
 		}
@@ -192,6 +200,8 @@ cc.Class({
 	touchStartBtn() {
 		// 隐藏开始按钮
 		this.btnStart.node.active = false;
+		// 隐藏排行榜按钮
+		this.btnRanking.node.active = false;
 		// 隐藏最高纪录
 		this.topScore.node.active = false;
 		// 游戏状态标记为Game_playing
@@ -215,11 +225,58 @@ cc.Class({
 		this.getBodys();
 	},
 	
+	touchRankingBtn() {
+		// 获取授权
+		this.initUserInfoButton();
+	},
+	
+	initUserInfoButton() {
+	    // 微信授权，此代码来自Cocos官方
+	    if (typeof wx === 'undefined') {
+	        return;
+	    }
+	
+	    let systemInfo = wx.getSystemInfoSync();
+	    let width = systemInfo.windowWidth;
+	    let height = systemInfo.windowHeight;
+	    let button = wx.createUserInfoButton({
+	        type: 'text',
+	        text: '',
+	        style: {
+	            left: 0,
+	            top: 0,
+	            width: width,
+	            height: height,
+	            lineHeight: 40,
+	            backgroundColor: '#00000000',
+	            color: '#00000000',
+	            textAlign: 'center',
+	            fontSize: 10,
+	            borderRadius: 4
+	        }
+	    });
+	
+	    button.onTap((res) => {
+	        if (res.userInfo) {
+	            // 可以在这里获取当前玩家的个人信息，如头像、微信名等。
+	            console.log('授权成功！');
+	        }
+	        else {
+	            console.log('授权失败！');
+	        }
+	
+	        button.hide();
+	        button.destroy();
+	    });
+	},
+	
 	gameOver() {
 		// 游戏结束时，显示gameover
 		this.spGameOver.node.active = true;
 		// 游戏结束时，显示开始按钮
 		this.btnStart.node.active = true;
+		// 游戏结束时，显示排行榜按钮
+		this.btnRanking.node.active = true;
 		// 游戏结束时，显示最高纪录
 		this.topScore.node.active = true;
 		// 游戏状态标记为Game_over
