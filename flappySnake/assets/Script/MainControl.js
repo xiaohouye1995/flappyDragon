@@ -67,10 +67,10 @@ cc.Class({
 			default: null,
 			type: cc.Button
 		},
-		btnRanking: {
-			default: null,
-			type: cc.Button
-		},
+		// btnRanking: {
+		// 	default: null,
+		// 	type: cc.Button
+		// },
 		gameStatus: 0,
 		gameScore: 0,
 		audioControl: {
@@ -98,9 +98,9 @@ cc.Class({
 		// 给开始按钮添加响应
 		this.btnStart.node.on(cc.Node.EventType.TOUCH_END, this.touchStartBtn, this);
 		// 获取排行榜按钮
-		this.btnRanking = this.node.getChildByName("BtnRanking").getComponent(cc.Button);
+		// this.btnRanking = this.node.getChildByName("BtnRanking").getComponent(cc.Button);
 		// 给排行榜按钮添加响应
-		this.btnRanking.node.on(cc.Node.EventType.TOUCH_END, this.touchRankingBtn, this);
+		// this.btnRanking.node.on(cc.Node.EventType.TOUCH_END, this.touchRankingBtn, this);
 		// 获取音频模块
 		this.audioControl = this.node.getChildByName("AudioSource").getComponent("AudioSourceControl");		
 	},
@@ -189,7 +189,7 @@ cc.Class({
 	// 获取跟随者数组
 	getBodys() {
 		let long = 70
-		for (let i = 0; i < 2; i++) {
+		for (let i = 0; i < 3; i++) {
 			this.body[i] = cc.instantiate(this.bodyPrefab);
 			this.node.getChildByName("Body").addChild(this.body[i]);
 			long -= 70
@@ -201,7 +201,7 @@ cc.Class({
 		// 隐藏开始按钮
 		this.btnStart.node.active = false;
 		// 隐藏排行榜按钮
-		this.btnRanking.node.active = false;
+		// this.btnRanking.node.active = false;
 		// 隐藏最高纪录
 		this.topScore.node.active = false;
 		// 游戏状态标记为Game_playing
@@ -276,7 +276,7 @@ cc.Class({
 		// 游戏结束时，显示开始按钮
 		this.btnStart.node.active = true;
 		// 游戏结束时，显示排行榜按钮
-		this.btnRanking.node.active = true;
+		// this.btnRanking.node.active = true;
 		// 游戏结束时，显示最高纪录
 		this.topScore.node.active = true;
 		// 游戏状态标记为Game_over

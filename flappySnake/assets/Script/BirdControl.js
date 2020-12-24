@@ -153,6 +153,8 @@ cc.Class({
 		}, 5000)
 		// 播放加命音效
 		this.mainControl.audioControl.playSound(SoundType.E_Sound_Life);
+		// 播放加速音效
+		this.mainControl.audioControl.playSound(SoundType.E_Sound_seep);
 	},
 	
 	// 清除定时器
