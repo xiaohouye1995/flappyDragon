@@ -1,2 +1,2 @@
-# flappySnake
-飞翔的贪吃蛇
+# flappyDragon
+飞翔的贪吃龙
