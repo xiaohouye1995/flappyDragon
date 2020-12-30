@@ -140,7 +140,9 @@ cc.Class({
 	gemCollision() {
 		cc.log("get gem");
 		this.spShield.active = true;
-		cc.sys.localStorage.setItem('moveSpeed', this.mainControl.moveSpeed);
+		if (this.mainControl.moveSpeed < 30) {
+			cc.sys.localStorage.setItem('moveSpeed', this.mainControl.moveSpeed);
+		}
 		this.mainControl.moveSpeed = 30;
 		this.mainControl.gem.x = -750;
 		this.gemStatus = true
