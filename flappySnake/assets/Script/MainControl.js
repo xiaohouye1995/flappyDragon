@@ -11,6 +11,7 @@ export const GameStatus = {
 }
 import AudioSourceControl from "./AudioSourceControl"
 import { SoundType } from "./AudioSourceControl"
+import { GameConfig } from "./GameConfig"
 cc.Class({
 	extends: cc.Component,
 
@@ -67,10 +68,6 @@ cc.Class({
 			default: null,
 			type: cc.Button
 		},
-		// btnRanking: {
-		// 	default: null,
-		// 	type: cc.Button
-		// },
 		gameStatus: 0,
 		gameScore: 0,
 		audioControl: {
@@ -81,207 +78,119 @@ cc.Class({
 	},
 
 	onLoad() {
-		// 开启碰撞检测
 		let collisionManager = cc.director.getCollisionManager();
 		collisionManager.enabled = true;
-		// 开启碰撞形状绘制
-		// collisionManager.enabledDebugDraw = true;
-		// 获得游戏结束的精灵
 		this.spGameOver = this.node.getChildByName("GameOver").getComponent(cc.Sprite);
-		// 游戏开始阶段隐藏起来
 		this.spGameOver.node.active = false;
-		// 获得最高纪录
 		this.oldTopScore = +cc.sys.localStorage.getItem('topScore') || 0
 		this.topScore.string = '最高纪录: ' + this.oldTopScore.toString();
-		// 获取开始按钮
 		this.btnStart = this.node.getChildByName("BtnStart").getComponent(cc.Button);
-		// 给开始按钮添加响应
 		this.btnStart.node.on(cc.Node.EventType.TOUCH_END, this.touchStartBtn, this);
-		// 获取排行榜按钮
-		// this.btnRanking = this.node.getChildByName("BtnRanking").getComponent(cc.Button);
-		// 给排行榜按钮添加响应
-		// this.btnRanking.node.on(cc.Node.EventType.TOUCH_END, this.touchRankingBtn, this);
-		// 获取音频模块
-		this.audioControl = this.node.getChildByName("AudioSource").getComponent("AudioSourceControl");		
+		this.audioControl = this.node.getChildByName("AudioSource").getComponent("AudioSourceControl");
 	},
 
 	start() {
-		// 生成障碍物
-		for (let i = 0; i < 3; i++) {
+		const C = GameConfig;
+		this.minX = C.BRICK_BASE_X;
+		this.minY = C.BRICK_Y_MIN;
+		this.maxY = C.BRICK_Y_MAX;
+		this.lifeMinY = C.LIFE_Y_MIN;
+		this.lifeMaxY = C.LIFE_Y_MAX;
+		this.gemMinY = C.GEM_Y_MIN;
+		this.gemMaxY = C.GEM_Y_MAX;
+
+		for (let i = 0; i < C.BRICK_COUNT; i++) {
 			this.bricks[i] = cc.instantiate(this.bricksPrefab);
 			this.node.getChildByName("Bricks").addChild(this.bricks[i]);
-			this.minX = 700;
-			this.minY = -500;
-			this.maxY = -100;
-			this.bricks[i].x = this.minX * i + Math.random() * 200;
+			this.bricks[i].x = this.minX * i + Math.random() * C.BRICK_RANDOM_X;
 			this.bricks[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 		}
-		
-		// 生成奖励心心
+
 		this.life = cc.instantiate(this.lifePrefab);
 		this.node.getChildByName("Life").addChild(this.life);
-		this.life.x = 570;
-		this.lifeMinY = -500;
-		this.lifeMaxY = 500;
+		this.life.x = C.LIFE_X_START;
 		this.life.y = this.lifeMinY + Math.random() * (this.lifeMaxY - this.lifeMinY);
-		
-		// 生成保护盾钻石
+
 		this.gem = cc.instantiate(this.gemPrefab);
 		this.node.getChildByName("Gem").addChild(this.gem);
-		this.gem.x = 770;
-		this.gemMinY = -500;
-		this.gemMaxY = 500;
+		this.gem.x = C.GEM_X_START;
 		this.gem.y = this.gemMinY + Math.random() * (this.gemMaxY - this.gemMinY);
 	},
 
 	update(dt) {
-		// 游戏状态不等于Game_playing时直接返回
 		if (this.gameStatus !== GameStatus.Game_playing) {
 			return
 		}
-		
-		// 移动距离
-		let moveWidth = 750
-		// 移动速度
-		let newMoveSpeed = this.moveSpeed + this.gameScore / 30;
-		if (newMoveSpeed > 30) {
-			newMoveSpeed = 30
+		const C = GameConfig;
+		let moveWidth = C.MOVE_WIDTH
+		let newMoveSpeed = this.moveSpeed + this.gameScore / C.SCORE_SPEED_DIV;
+		if (newMoveSpeed > C.MOVE_SPEED_CAP) {
+			newMoveSpeed = C.MOVE_SPEED_CAP
 		}
 
-		// 移动背景图
-		// for (let i = 0; i < this.SpBg.length; i++) {
-		// 	this.SpBg[i].node.x -= newMoveSpeed;		
-		// 	if (this.SpBg[i].node.x <= -700) {
-		// 		this.SpBg[i].node.x = moveWidth;
-		// 	}
-		// }
-
-		// 移动障碍物
 		for (let i = 0; i < this.bricks.length; i++) {
 			this.bricks[i].x -= newMoveSpeed;
-			if (this.bricks[i].x <= -1300) {
-				this.bricks[i].x = moveWidth;			
+			if (this.bricks[i].x <= C.BRICK_RESPAWN_X) {
+				this.bricks[i].x = moveWidth;
 				this.bricks[i].y = this.minY + Math.random() * (this.maxY - this.minY);
-				// 播放加分音效
-				// this.audioControl.playSound(SoundType.E_Sound_Score);
-				// 分数
 				this.gameScore += 1;
 				this.labelScore.string = this.gameScore.toString();
 			}
 		}
-		
-		// 移动奖励心心
+
 		this.life.x -= newMoveSpeed;
-		if (this.life.x <= -2750) {
+		if (this.life.x <= C.ITEM_RECYCLE_X) {
 			this.life.x = moveWidth;
 			this.life.y = this.lifeMinY + Math.random() * (this.lifeMaxY - this.lifeMinY);
 		}
-		
-		// 移动钻石
+
 		this.gem.x -= newMoveSpeed;
-		if (this.gem.x <= -2750) {
+		if (this.gem.x <= C.ITEM_RECYCLE_X) {
 			this.gem.x = moveWidth;
-			this.gem.y = this.lifeMinY + Math.random() * (this.lifeMaxY - this.lifeMinY);
+			this.gem.y = this.gemMinY + Math.random() * (this.gemMaxY - this.gemMinY);
 		}
-		
 	},
-	
-	// 获取跟随者数组
+
 	getBodys() {
-		let long = 70
-		for (let i = 0; i < 3; i++) {
+		const C = GameConfig;
+		let long = C.BODY_GAP
+		for (let i = 0; i < C.BODY_INITIAL; i++) {
 			this.body[i] = cc.instantiate(this.bodyPrefab);
 			this.node.getChildByName("Body").addChild(this.body[i]);
-			long -= 70
+			long -= C.BODY_GAP
 			this.body[i].x = long
 		}
 	},
-	
+
 	touchStartBtn() {
-		// 隐藏开始按钮
 		this.btnStart.node.active = false;
-		// 隐藏排行榜按钮
-		// this.btnRanking.node.active = false;
-		// 隐藏最高纪录
 		this.topScore.node.active = false;
-		// 游戏状态标记为Game_playing
 		this.gameStatus = GameStatus.Game_playing;
-		// 再来一局时，隐藏gameover图片
 		this.spGameOver.node.active = false;
-		// 再来一局时，障碍物重置位置
 		for (let i = 0; i < this.bricks.length; i++) {
 			this.bricks[i].x = this.minX * i;
 			this.bricks[i].y = this.minY + Math.random() * (this.maxY - this.minY);
 		}
-		// 再来一局时，还原主角位置和角度
 		let bird = this.node.getChildByName("Bird");
-		bird.y = 100;
-		// bird.rotation = 0;
-		// 分数清零
+		bird.y = GameConfig.BIRD_START_Y;
 		this.gameScore = 0;
-		// 速度清零
-		this.moveSpeed = 8;
+		this.moveSpeed = GameConfig.MOVE_SPEED_START;
 		this.labelScore.string = this.gameScore.toString();
 		this.getBodys();
 	},
-	
-	touchRankingBtn() {
-		// 获取授权
-		this.initUserInfoButton();
-	},
-	
-	initUserInfoButton() {
-	    // 微信授权，此代码来自Cocos官方
-	    if (typeof wx === 'undefined') {
-	        return;
-	    }
-	
-	    let systemInfo = wx.getSystemInfoSync();
-	    let width = systemInfo.windowWidth;
-	    let height = systemInfo.windowHeight;
-	    let button = wx.createUserInfoButton({
-	        type: 'text',
-	        text: '',
-	        style: {
-	            left: 0,
-	            top: 0,
-	            width: width,
-	            height: height,
-	            lineHeight: 40,
-	            backgroundColor: '#00000000',
-	            color: '#00000000',
-	            textAlign: 'center',
-	            fontSize: 10,
-	            borderRadius: 4
-	        }
-	    });
-	
-	    button.onTap((res) => {
-	        if (res.userInfo) {
-	            // 可以在这里获取当前玩家的个人信息，如头像、微信名等。
-	            console.log('授权成功！');
-	        }
-	        else {
-	            console.log('授权失败！');
-	        }
-	
-	        button.hide();
-	        button.destroy();
-	    });
-	},
-	
+
 	gameOver() {
-		// 游戏结束时，显示gameover
+		let bird = this.node.getChildByName("Bird");
+		if (bird) {
+			let bc = bird.getComponent("BirdControl");
+			if (bc && bc.clearGemTimer) {
+				bc.clearGemTimer();
+			}
+		}
 		this.spGameOver.node.active = true;
-		// 游戏结束时，显示开始按钮
 		this.btnStart.node.active = true;
-		// 游戏结束时，显示排行榜按钮
-		// this.btnRanking.node.active = true;
-		// 游戏结束时，显示最高纪录
 		this.topScore.node.active = true;
-		// 游戏状态标记为Game_over
 		this.gameStatus = GameStatus.Game_over;
-		// 播放结束音效
 		this.audioControl.playSound(SoundType.E_Sound_Die);
 		this.node.getChildByName("Body").removeAllChildren();
 		this.body = [];
